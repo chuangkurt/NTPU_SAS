@@ -1,0 +1,6 @@
+Peterson  21       M
+South  Black
+100  180
+Morgan    17       F
+North  Hispanic
+50   150
