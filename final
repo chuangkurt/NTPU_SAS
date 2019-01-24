@@ -1,0 +1,50 @@
+%let dirstat=C:\Users\User\Desktop\class_SAS\final;
+proc import 
+datafile="&dirstat\statpack107fHW16.csv"
+	out=final
+dbms=CSV replace;
+getnames=yes;
+run;
+
+/*資料整理*/
+%macro mysite(out,indata);
+data final_1;
+set final;
+ARRAY A A1-A26;
+A&out=sum ((input(scan(&indata,1,'+'),2.)) , (input(scan(&indata,-1,'+'),1.)));
+label
+ID ='編號' Name='名字' Age ='年齡' Photo='照片' Nationality='國籍' Flag='國旗' Overall ='整體評價' Potential ='潛在評價' Club='現任俱樂部' Club Logo ='俱樂部標誌' Value='目前市場價值' Wage ='目前工資' Preferred_Foot ='特別優選的腳' International_Reputation ='國際聲譽'
+Weak_Foot ='非慣用腳' Skill_Moves ='花式盤球' Work_Rate ='跑動量' Body_Type ='體態' Position='在球場上的位置' Jersey_Number ='隊服號碼' Joined ='入盟日期' Loaned_From ='俱樂部名稱' Contract_ValidUntil ='合約有效期限' Height ='身高'
+Weight='體重' Crossing='橫穿能力' Finishing='射門' HeadingAccuracy='頭球' ShortPassing='短傳' Volleys='凌空抽射' Dribbling='盤帶' Curve='弧線' FKAccuracy='任意球' LongPassing='長傳' BallControl='控球' Acceleration='加速' SprintSpeed='衝刺速度'
+Agility='敏捷' Reactions='反應' Balance='平衡' ShotPower='射門力量' Jumping='起跳' Stamina='耐力' Strength='力量' LongShots='遠射' Aggression='侵略性' Interceptions='攔截' Positioning='站位' Vision='視野' Penalties='點球' Composure='鎮定'
+Marking='盯人' StandingTackle='站立搶斷' SlidingTackle='滑鏟' GKDiving='門將撲救' GKHandling='門將抓球' GKKicking='門將踢球' GKPositioning='門將站位' GKReflexes='門將反應' Release Clause='解約價格';
+run;
+%mend;
+%mysite(1,LS);
+%mysite(2,ST);
+%mysite(3,RS);
+%mysite(4,LW);
+%mysite(5,LF);
+%mysite(6,CF);
+%mysite(7,RF);
+%mysite(8,RW);
+%mysite(9,LAM);
+%mysite(10,CAM);
+%mysite(11,RAM);
+%mysite(12,LM);
+%mysite(13,LCM);
+%mysite(14,CM);
+%mysite(15,RCM);
+%mysite(16,RM);
+%mysite(17,LWB);
+%mysite(18,LDM);
+%mysite(19,CDM);
+%mysite(20,RDM);
+%mysite(21,RWB);
+%mysite(22,LB);
+%mysite(23,LCB);
+%mysite(24,CB);
+%mysite(25,RCB);
+%mysite(26,RB);
+
+proc print data=final_1 (obs=5) label;run;
