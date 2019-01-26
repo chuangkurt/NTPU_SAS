@@ -8,16 +8,19 @@ run;
 
 /*資料整理*/
 %macro mysite(out,indata);
-data final_1;
+data final_&out;
 set final;
-ARRAY A A1-A26;
 A&out=sum ((input(scan(&indata,1,'+'),2.)) , (input(scan(&indata,-1,'+'),1.)));
+drop &indata;
 label
 ID ='編號' Name='名字' Age ='年齡' Photo='照片' Nationality='國籍' Flag='國旗' Overall ='整體評價' Potential ='潛在評價' Club='現任俱樂部' Club Logo ='俱樂部標誌' Value='目前市場價值' Wage ='目前工資' Preferred_Foot ='特別優選的腳' International_Reputation ='國際聲譽'
 Weak_Foot ='非慣用腳' Skill_Moves ='花式盤球' Work_Rate ='跑動量' Body_Type ='體態' Position='在球場上的位置' Jersey_Number ='隊服號碼' Joined ='入盟日期' Loaned_From ='俱樂部名稱' Contract_ValidUntil ='合約有效期限' Height ='身高'
 Weight='體重' Crossing='橫穿能力' Finishing='射門' HeadingAccuracy='頭球' ShortPassing='短傳' Volleys='凌空抽射' Dribbling='盤帶' Curve='弧線' FKAccuracy='任意球' LongPassing='長傳' BallControl='控球' Acceleration='加速' SprintSpeed='衝刺速度'
 Agility='敏捷' Reactions='反應' Balance='平衡' ShotPower='射門力量' Jumping='起跳' Stamina='耐力' Strength='力量' LongShots='遠射' Aggression='侵略性' Interceptions='攔截' Positioning='站位' Vision='視野' Penalties='點球' Composure='鎮定'
 Marking='盯人' StandingTackle='站立搶斷' SlidingTackle='滑鏟' GKDiving='門將撲救' GKHandling='門將抓球' GKKicking='門將踢球' GKPositioning='門將站位' GKReflexes='門將反應' Release Clause='解約價格';
+run;
+proc sort data=final_&out;
+by _;
 run;
 %mend;
 %mysite(1,LS);
@@ -47,4 +50,74 @@ run;
 %mysite(25,RCB);
 %mysite(26,RB);
 
-proc print data=final_1 (obs=5) label;run;
+data allfinal_1;
+merge final_1-final_26;
+by _;
+drop ST--RB LS;
+run;
+
+data allfinal_2;
+set allfinal_1;
+nValue =input(compress(Value,"€""M"),5.1); 
+nWage =input(compress(Wage,"€""K"),5.1); 
+nRelease_Clause =input(compress(Release_Clause,"€""M"),5.1); 
+drop Value Wage Release_Clause;
+label nValue='目前市場價值' nWage='目前工資' nRelease_Clause='Release_Claus';
+run;
+
+
+ID ='編號' Name='名字' Age ='年齡' Photo='照片' Nationality='國籍' Flag='國旗' Overall ='整體評價' Potential ='潛在評價' Club='現任俱樂部' Club Logo ='俱樂部標誌' Value='目前市場價值' Wage ='目前工資' Preferred_Foot ='特別優選的腳' International_Reputation ='國際聲譽'
+Weak_Foot ='非慣用腳' Skill_Moves ='花式盤球' Work_Rate ='跑動量' Body_Type ='體態' Position='在球場上的位置' Jersey_Number ='隊服號碼' Joined ='入盟日期' Loaned_From ='俱樂部名稱' Contract_ValidUntil ='合約有效期限' Height ='身高'
+Weight='體重' Crossing='橫穿能力' Finishing='射門' HeadingAccuracy='頭球' ShortPassing='短傳' Volleys='凌空抽射' Dribbling='盤帶' Curve='弧線' FKAccuracy='任意球' LongPassing='長傳' BallControl='控球' Acceleration='加速' SprintSpeed='衝刺速度'
+Agility='敏捷' Reactions='反應' Balance='平衡' ShotPower='射門力量' Jumping='起跳' Stamina='耐力' Strength='力量' LongShots='遠射' Aggression='侵略性' Interceptions='攔截' Positioning='站位' Vision='視野' Penalties='點球' Composure='鎮定'
+Marking='盯人' StandingTackle='站立搶斷' SlidingTackle='滑鏟' GKDiving='門將撲救' GKHandling='門將抓球' GKKicking='門將踢球' GKPositioning='門將站位' GKReflexes='門將反應' Release Clause='解約價格';
+
+/*目前工資*位置*/
+proc sort data=allfinal_2;
+by  nWage;
+run;
+proc means data=allfinal_2;
+var nWage;
+class Position;
+ods output summary=allfinal_2_mean;
+run;
+proc sgplot data=allfinal_2_mean;
+series x=Position y=nWage_Mean;
+run;
+proc sgplot data=allfinal_2;
+vbox nWage/group=Position;
+run;
+/*目前市場價值*位置*/
+proc sort data=allfinal_2;
+by  nValue;
+run;
+proc means data=allfinal_2;
+var nValue;
+class Position;
+ods output summary=allfinal_2_mean;
+run;
+proc sgplot data=allfinal_2_mean;
+series x=Position y=nValue_Mean;
+run;
+proc sgplot data=allfinal_2;
+vbox nValue/group=Position;
+run;
+/*整體評價*位置*/
+proc sort data=allfinal_2;
+by  Overall ;
+run;
+proc means data=allfinal_2;
+var Overall ;
+class Position;
+ods output summary=allfinal_2_mean;
+run;
+proc sgplot data=allfinal_2_mean;
+series x=Position y=Overall_Mean;
+run;
+proc sgplot data=allfinal_2;
+vbox Overall/group=Position;
+run;
+
+
+
+proc print data=allfinal_2 (obs=5) label;run;
